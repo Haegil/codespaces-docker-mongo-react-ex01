@@ -1,21 +1,20 @@
-require('dotenv').config();
+const http = require("http");
+const express = require("express");
+const cors = require("cors");
 
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-const path = require('path');
+const chatApp = require("./app");
+const mainApp = express();
 
-const carRoutes = require('./routes/carsRoutes');
+mainApp.use(cors());
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// /chat 아래로 채팅 API 연결
+mainApp.use("/chat", chatApp);
 
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-app.use("/", express.static(path.join(__dirname, "public")));
+// 정적 파일 제공(public 폴더)
+mainApp.use("/", express.static("public"));
 
-app.use('/cars', carRoutes);
+const server = http.createServer(mainApp);
 
-app.listen(PORT, () => {
-  console.log(`SERVER IS LISTENING NOW: http://localhost:${PORT}`);
-})
+server.listen(3000, function () {
+  console.log("running on server with http://localhost:3000");
+});
